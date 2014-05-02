@@ -31,7 +31,7 @@
 namespace calibu {
 
 TargetGridDot::TargetGridDot(double grid_spacing, Eigen::Vector2i grid_size, uint32_t seed)
-    : grid_spacing(grid_spacing), grid_size(grid_size)
+    : grid_spacing_x(grid_spacing), grid_spacing_y(grid_spacing), grid_size(grid_size)
 {
     // Create binary pattern (and rotated pattern) from seed
     PG = MakePatternGroup(grid_size(1), grid_size(0), seed);
@@ -54,15 +54,15 @@ void TargetGridDot::Init() {
   for(int r=0; r< grid_size(1); ++r) {
     for(int c=0; c< grid_size(0); ++c) {
       Eigen::Vector2i p = Eigen::Vector2i(c,r);
-      tpts2d[r*grid_size(0)+c] = grid_spacing * Eigen::Vector2d(p(0), p(1));
-      tpts3d[r*grid_size(0)+c] = grid_spacing * Eigen::Vector3d(p(0), p(1), 0);
+            tpts2d[r*grid_size(0)+c] = Eigen::Vector2d(grid_spacing_x * p(0), grid_spacing_y * p(1));
+            tpts3d[r*grid_size(0)+c] = Eigen::Vector3d(grid_spacing_x * p(0), grid_spacing_y * p(1), 0);
     }
   }
 
   // create binary pattern coords
   codepts3d.resize( 8 );
-  double r = grid_spacing*(grid_size(1)+2.5);
-  double dx =  (grid_spacing*(grid_size(0)-1))/8;
+  double r = grid_spacing_y * (grid_size(1)+2.5);
+  double dx =  (grid_spacing_x * (grid_size(0)-1))/8;
   Eigen::Vector3d base( dx/2.0, 0, 0 );
   for( int c = 0; c < 8; c++ ){
     codepts3d[c] = base + Eigen::Vector3d( dx*c, r, 0 );
@@ -594,8 +594,8 @@ void TargetGridDot::SaveEPS(
     const double border = 3*rad1;
     const Eigen::Vector2d border2d(border,border);
     const Eigen::Vector2d max_pts(
-            pts_per_unit * ((M.cols()-1) * grid_spacing + 2*border),
-            pts_per_unit * ((M.rows()-1) * grid_spacing + 2*border)
+            pts_per_unit * ((M.cols()-1) * grid_spacing_x + 2*border),
+            pts_per_unit * ((M.rows()-1) * grid_spacing_y + 2*border)
             );
 
     std::ofstream f;
@@ -612,7 +612,8 @@ void TargetGridDot::SaveEPS(
     for( int r=0; r<M.rows(); ++r ) {
         for( int c=0; c<M.cols(); ++c) {
             const double rad_pts = pts_per_unit * ((M(r,c) == 1) ? rad1 : rad0);
-            const Eigen::Vector2d p_pts = pts_per_unit* (offset + border2d + grid_spacing * Eigen::Vector2d(c,r));
+            const Eigen::Vector2d p_pts = pts_per_unit* (offset + border2d
+                + Eigen::Vector2d(grid_spacing_x * c,  grid_spacing_y * r));
             f << p_pts[0] << " " << max_pts[1] - p_pts[1] << " "
                 << rad_pts << " 0 360 arc closepath" << std::endl
                 << "0.0 setgray fill" << std::endl
@@ -621,8 +622,8 @@ void TargetGridDot::SaveEPS(
     }
 
     // output the binary code -- blank if id == 0, which is the default
-    double r = grid_spacing*( M.rows()+2.5 );
-    double dx =  (grid_spacing*(M.cols()-1))/8;
+    double r = grid_spacing_x*( M.rows()+2.5 );
+    double dx =  (grid_spacing_y*(M.cols()-1))/8;
     double hw = (pts_per_unit*dx)/2;
     Eigen::Vector2d base( dx/2.0, 0 );
     for( int c = 0; c < 8; c++ ){

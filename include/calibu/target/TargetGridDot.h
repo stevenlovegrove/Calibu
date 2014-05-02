@@ -69,7 +69,8 @@ public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
     TargetGridDot(double grid_spacing, Eigen::Vector2i grid_size, uint32_t seed = 71);
-    TargetGridDot(double grid_spacing, const Eigen::MatrixXi& grid);
+
+    TargetGridDot(double grid_spacing_x, double grid_spacing_y, Eigen::Vector2i grid_size, uint32_t seed = 71);
 
     ////////////////////////////////////////////////////////////////////////////
 
@@ -99,7 +100,7 @@ public:
     inline double CircleRadius() const
     {
         // TODO: Load this from eps or something.
-        return grid_spacing / 10.0;
+        return grid_spacing_x / 10.0;
     }
 
     inline const std::vector<Eigen::Vector2d,
@@ -156,7 +157,8 @@ public:
     std::vector<Eigen::Vector3d, Eigen::aligned_allocator<Eigen::Vector3d> > tpts3d;
   std::vector<Eigen::Vector3d, Eigen::aligned_allocator<Eigen::Vector3d> > codepts3d;
 
-    double grid_spacing;
+    double grid_spacing_x;
+    double grid_spacing_y;
     Eigen::Vector2i grid_size;
     std::array<Eigen::MatrixXi,4> PG;
 

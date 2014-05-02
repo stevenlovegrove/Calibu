@@ -27,6 +27,8 @@ const char* sUriInfo =
     "\t                       By default calibgrid will output to cameras.xml\n"
     "\t-cameras,-c <file>     Input XML file to read starting intrinsics from.\n"
     "\t-grid-spacing <value>  Distance between circles in grid\n"
+    "\t-grid-spacing-x <value>  Distance between circles in grid x-direction\n"
+    "\t-grid-spacing-y <value>  Distance between circles in grid y-direction\n"
     "\t-grid-seed <value>     Random seed used when creating grid (=71)\n"
     "\t-fix-intrinsics,-f     Fix camera intrinsics during optimisation.\n"
     "\t-paused,-p             Start video paused.\n"
@@ -148,9 +150,13 @@ int main( int argc, char** argv)
 
   // Default grid printed on US Letter
   double grid_spacing = 0.254 / (grid_rows - 1);
+  double grid_spacing_x = 0;
+  double grid_spacing_y = 0;
   const Eigen::Vector2i grid_size(grid_rows, grid_cols);
 
   grid_spacing = cl.follow(grid_spacing, "-grid-spacing");
+  grid_spacing_x = cl.follow(grid_spacing_x, "-grid-spacing-x");
+  grid_spacing_y = cl.follow(grid_spacing_y, "-grid-spacing-y");
   grid_seed = cl.follow((int) grid_seed, "-grid-seed");
   fix_intrinsics = cl.search(2, "-fix-intrinsics", "-f");
   start_paused = cl.search(2, "-paused", "-p");
@@ -221,7 +227,15 @@ int main( int argc, char** argv)
   conic_finder.Params().conic_min_density = 0.6;
   conic_finder.Params().conic_min_aspect = 0.2;
 
-  TargetGridDot target( grid_spacing, grid_size, grid_seed );
+  if ((grid_spacing_x == 0) && (grid_spacing_y == 0)) {
+    std::cerr << "Starting target with grid_spacing = " << grid_spacing;
+    grid_spacing_x = grid_spacing;
+    grid_spacing_y = grid_spacing;
+  } else {
+    std::cerr << "Starting target with grid_spacing_x = " << grid_spacing_x
+        << ", and grid_spacing_y = " << grid_spacing_y;
+  }
+  TargetGridDot target( grid_spacing_x, grid_spacing_y, grid_size, grid_seed );
 
   double rad0 = 0.003; // cm
   double rad1 = 0.005; // cm
@@ -407,7 +421,8 @@ int main( int argc, char** argv)
               const Eigen::Vector2i pg = target.Map()[p].pg;
 
               if( 0<= pg(0) && pg(0) < grid_size(0) &&  0<= pg(1) && pg(1) < grid_size(1) ) {
-                const Eigen::Vector3d pg3d = grid_spacing * Eigen::Vector3d(pg(0), pg(1), 0);
+                const Eigen::Vector3d pg3d =
+                    Eigen::Vector3d(grid_spacing_x * pg(0), grid_spacing_y * pg(1), 0);
                 // TODO: Add these correspondences in bulk to avoid
                 //       hitting mutex each time.
                 calibrator.AddObservation( calib_frame, calib_cams[iI], pg3d, pc );
@@ -592,8 +607,8 @@ int main( int argc, char** argv)
 
               if (0 <= pg(0) && pg(0) < grid_size(0) && 0 <= pg(1)
                   && pg(1) < grid_size(1)) {
-                const Eigen::Vector3d pg3d = grid_spacing
-                    * Eigen::Vector3d(pg(0), pg(1), 0);
+                const Eigen::Vector3d pg3d =
+                    Eigen::Vector3d(grid_spacing_x * pg(0), grid_spacing_y * pg(1), 0);
                 // TODO: Add these correspondences in bulk to avoid
                 //       hitting mutex each time.
                 calibrator.AddObservation(calib_frame,
