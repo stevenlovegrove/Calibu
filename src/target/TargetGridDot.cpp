@@ -54,8 +54,8 @@ void TargetGridDot::Init() {
   for(int r=0; r< grid_size(1); ++r) {
     for(int c=0; c< grid_size(0); ++c) {
       Eigen::Vector2i p = Eigen::Vector2i(c,r);
-            tpts2d[r*grid_size(0)+c] = Eigen::Vector2d(grid_spacing_x * p(0), grid_spacing_y * p(1));
-            tpts3d[r*grid_size(0)+c] = Eigen::Vector3d(grid_spacing_x * p(0), grid_spacing_y * p(1), 0);
+      tpts2d[r*grid_size(0)+c] = Eigen::Vector2d(grid_spacing_x * p(0), grid_spacing_y * p(1));
+      tpts3d[r*grid_size(0)+c] = Eigen::Vector3d(grid_spacing_x * p(0), grid_spacing_y * p(1), 0);
     }
   }
 
