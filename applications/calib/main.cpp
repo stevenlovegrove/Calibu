@@ -228,12 +228,8 @@ int main( int argc, char** argv)
   conic_finder.Params().conic_min_aspect = 0.2;
 
   if ((grid_spacing_x == 0) && (grid_spacing_y == 0)) {
-    std::cerr << "Starting target with grid_spacing = " << grid_spacing;
     grid_spacing_x = grid_spacing;
     grid_spacing_y = grid_spacing;
-  } else {
-    std::cerr << "Starting target with grid_spacing_x = " << grid_spacing_x
-        << ", and grid_spacing_y = " << grid_spacing_y;
   }
   TargetGridDot target( grid_spacing_x, grid_spacing_y, grid_size, grid_seed );
 
