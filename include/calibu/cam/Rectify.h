@@ -28,73 +28,10 @@
 #include <calibu/Platform.h>
 #include <calibu/cam/CameraModel.h>
 #include <calibu/utils/Range.h>
+#include <calibu/cam/LookupTable.h>
 
 namespace calibu
 {
-    ///////////////////////////////////////////////////////////////////////////////
-    /// This structure is used to build a LUT without requiring branching
-    //  when rectifying images. The values out of the image to the top left
-    //  pixels instead of having a test for out of bound access, the aim is
-    //  to avoid a branch in the code.
-    //
-    //    int xt = (int) x;  /* top-left corner */
-    //    int yt = (int) y;
-    //    float ax = x - xt;
-    //    float ay = y - yt;
-    //    float *ptr = image + (width*yt) + xt;
-    //
-    //    return( (1-ax) * (1-ay) * *ptr +
-    //            ( ax ) * (1-ay) * *(ptr+1) +
-    //            (1-ax) * ( ay ) * *(ptr+(width)) +
-    //            ( ax ) * ( ay ) * *(ptr+(width)+1) );
-    struct BilinearLutPoint
-    {
-        int idx0; // index to pixel in src image
-        int idx1; // index to pixel + one row in src image
-        float w00; // top left weight for bilinear interpolation
-        float w01; // top right weight for bilinear interpolation
-        float w10; // bottom left weight ...
-        float w11; // bottom right weight ...
-    };
-
-    ///////////////////////////////////////////////////////////////////////////////
-    CALIBU_EXPORT
-    struct LookupTable
-    {
-        inline LookupTable(){};
-        inline LookupTable( int nWidth, int nHeight )
-        {
-            m_vLutPixels.resize( nWidth*nHeight );
-            m_nWidth = nWidth;
-        }
-
-        inline LookupTable( const LookupTable& rhs )
-        {
-            m_vLutPixels.resize( rhs.m_vLutPixels.size() );
-            m_nWidth = rhs.m_nWidth;
-            m_vLutPixels = rhs.m_vLutPixels;
-        }
-
-        inline unsigned int Width() const
-        {
-            return m_nWidth;
-        }
-
-        inline unsigned int Height() const
-        {
-            return m_vLutPixels.size() / m_nWidth;
-        }
-
-        inline void SetPoint( unsigned int nRow, unsigned int nCol, const BilinearLutPoint& p )
-        {
-            m_vLutPixels[ nRow*m_nWidth + nCol ] = p;
-        }
-
-        std::vector<BilinearLutPoint> m_vLutPixels;
-        int m_nWidth; // so m_nHeight = m_vPixels.size()/m_nWidth
-    };
-
-
     /// Create lookup table which can be used to remap a general camera model
     /// 'cam_from' to a linear and potentially rotated model, 'R_onK'.
     /// R_onK is formed from the multiplication R_on (old form new) and the new
