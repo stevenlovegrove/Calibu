@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include <pangolin/gldraw.h>
+#include <pangolin/pangolin.h>
 
 #include <Eigen/Dense>
 
