@@ -25,6 +25,7 @@
 #include <calibu/cam/CameraUtils.h>
 
 #include <sophus/se3.hpp>
+#include <stdint.h>
 
 namespace calibu
 {

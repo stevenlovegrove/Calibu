@@ -22,6 +22,7 @@
 #pragma once
 #include <Eigen/Eigen>
 #include <sophus/se3.hpp>
+#include <stdint.h>
 
 namespace calibu {
 template<typename Scalar = double>
