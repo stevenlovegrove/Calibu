@@ -1,3 +1,6 @@
+include(def_library)
+include(export_package)
+
 #######################################################
 ## Sources
 
@@ -102,18 +105,6 @@ endif()
 include_directories( ${CALIBU_INC} )
 include_directories( ${USER_INC} )
 
-## Generate symbol export helper header on MSVC
-IF(MSVC)
-    string(TOUPPER ${LIBRARY_NAME} LIBRARY_NAME_CAPS)
-    include(GenerateExportHeader)
-    GENERATE_EXPORT_HEADER( ${LIBRARY_NAME}
-        BASE_NAME ${LIBRARY_NAME_CAPS}
-        EXPORT_MACRO_NAME ${LIBRARY_NAME_CAPS}_EXPORT
-        EXPORT_FILE_NAME "${CMAKE_CURRENT_BINARY_DIR}/include/${LIBRARY_NAME}/${LIBRARY_NAME}_export.h"
-        STATIC_DEFINE ${LIBRARY_NAME_CAPS}_BUILT_AS_STATIC
-    )
-ENDIF()
-
 #######################################################
 ## Create configure file for inclusion in library
 
@@ -128,10 +119,41 @@ configure_file(
 list(APPEND CALIBU_INC ${CMAKE_CURRENT_BINARY_DIR}/include/)
 
 # Configure the include directories for export_package
-set(EXPORT_CALIBU_INC ${CALIBU_INC} ${USER_INC} PARENT_SCOPE)
-set(CALIBU_HEADERS ${HEADERS} PARENT_SCOPE)
-set(CALIBU_SOURCES ${SOURCES} PARENT_SCOPE)
-set(CALIBU_LINK_LIBS ${LINK_LIBS} PARENT_SCOPE)
+set(EXPORT_CALIBU_INC ${CALIBU_INC} ${USER_INC} )
+set(CALIBU_HEADERS ${HEADERS} )
+set(CALIBU_SOURCES ${SOURCES} )
+set(CALIBU_LINK_LIBS ${LINK_LIBS} )
+
+#######################################################
+## Define and export library
+
+def_library(calibu
+  SOURCES ${CALIBU_HEADERS} ${CALIBU_SOURCES}
+  LINK_LIBS ${CALIBU_LINK_LIBS}
+  PACKAGE Calibu
+  )
+
+export_package(Calibu
+  TARGETS ${LIBRARY_NAME}
+  VERSION ${CALIBU_VERSION}
+  LIBRARY ${LIBRARY_NAME}
+  LIBRARIES ${LIBRARY_NAME}
+  INCLUDE_DIRS ${EXPORT_CALIBU_INC}
+  )
+
+#######################################################
+## Generate symbol export helper header on MSVC
+
+IF(MSVC)
+    string(TOUPPER ${LIBRARY_NAME} LIBRARY_NAME_CAPS)
+    include(GenerateExportHeader)
+    GENERATE_EXPORT_HEADER( ${LIBRARY_NAME}
+        BASE_NAME ${LIBRARY_NAME_CAPS}
+        EXPORT_MACRO_NAME ${LIBRARY_NAME_CAPS}_EXPORT
+        EXPORT_FILE_NAME "${CMAKE_CURRENT_BINARY_DIR}/include/${LIBRARY_NAME}/${LIBRARY_NAME}_export.h"
+        STATIC_DEFINE ${LIBRARY_NAME_CAPS}_BUILT_AS_STATIC
+    )
+ENDIF()
 
 #######################################################
 ## Install headers
