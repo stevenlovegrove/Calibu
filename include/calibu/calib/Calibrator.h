@@ -194,7 +194,11 @@ public:
         // Create cost function
         CostFunctionAndParams* cost = new CostFunctionAndParams();
         
-        if( dynamic_cast<CameraModelT<Fov>* >(&cp.camera.GetCameraModelInterface()) ) {
+        if( dynamic_cast<CameraModelT<Pinhole>* >(&cp.camera.GetCameraModelInterface()) ) {
+            cost->Cost() =  new ceres::AutoDiffCostFunction<ReprojectionCostFunctor<Pinhole>,
+                    2, Sophus::SE3d::num_parameters, Sophus::SE3d::num_parameters,
+                    Pinhole::NUM_PARAMS>( new ReprojectionCostFunctor<Pinhole>(P_w, p_c) );
+        } else if( dynamic_cast<CameraModelT<Fov>* >(&cp.camera.GetCameraModelInterface()) ) {
             cost->Cost() =  new ceres::AutoDiffCostFunction<ReprojectionCostFunctor<Fov>,
                     2, Sophus::SE3d::num_parameters, Sophus::SE3d::num_parameters,
                     Fov::NUM_PARAMS>( new ReprojectionCostFunctor<Fov>(P_w, p_c) );            

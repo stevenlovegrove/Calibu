@@ -23,17 +23,18 @@ const char* sUriInfo =
     "Usage:"
     "\tcalibgrid <options> video_uri\n"
     "Options:\n"
-    "\t-output,-o <file>      Output XML file to write camera models to.\n"
-    "\t                       By default calibgrid will output to cameras.xml\n"
-    "\t-cameras,-c <file>     Input XML file to read starting intrinsics from.\n"
-    "\t-grid-spacing <value>  Distance between circles in grid\n"
-    "\t-grid-seed <value>     Random seed used when creating grid (=71)\n"
-    "\t-fix-intrinsics,-f     Fix camera intrinsics during optimisation.\n"
-    "\t-paused,-p             Start video paused.\n"
-    "\t-grid-rows <value>	  Number of rows in the grid pattern.\n"
-    "\t-grid-cols <value>     Number of columns in the grid pattern.\n"
-    "\t-no-gui                Run without gui.\n"
-    "\t-max-opt-time <value>  Max time in seconds allowed to the optimiser.\n"
+    "\t-output,-o <file>          Output XML file to write camera models to.\n"
+    "\t                           By default calibgrid will output to cameras.xml\n"
+    "\t-cameras,-c <file>|<model> Input XML file to read starting intrinsics from.\n"
+    "\t-grid-spacing <value>      Distance between circles in grid\n"
+    "\t-grid-seed <value>         Random seed used when creating grid (=71)\n"
+    "\t-fix-intrinsics,-f         Fix camera intrinsics during optimisation.\n"
+    "\t-paused,-p                 Start video paused.\n"
+    "\t-grid-rows <value>	      Number of rows in the grid pattern.\n"
+    "\t-grid-cols <value>         Number of columns in the grid pattern.\n"
+    "\t-no-gui                    Run without gui.\n"
+    "\t-max-opt-time <value>      Max time in seconds allowed to the optimiser.\n\n"
+    "\t <model> = pinhole | fov | poly3 | poly4 | kb4\n\n"
     "e.g.:\n"
     "\tcalibgrid -c leftcam.xml -c rightcaml.xml video_uri\n\n"
     "Video URI's take the following form:\n"
@@ -168,7 +169,11 @@ int main( int argc, char** argv)
       const int w_i = video.Streams()[i].Width();
       const int h_i = video.Streams()[i].Height();
 
-      if(filename == "fov") {
+      if(filename == "pinhole") {
+              CameraModelT<Pinhole> starting_cam(w_i, h_i);
+              starting_cam.Params()  << 300, 300, w_i/2.0, h_i/2.0, 0.2;
+              input_cameras.push_back( CameraAndPose(CameraModel(starting_cam), Sophus::SE3d() ) );
+      }else if(filename == "fov") {
         CameraModelT<Fov> starting_cam(w_i, h_i);
         starting_cam.Params()  << 300, 300, w_i/2.0, h_i/2.0, 0.2;
         input_cameras.push_back( CameraAndPose(CameraModel(starting_cam), Sophus::SE3d() ) );
