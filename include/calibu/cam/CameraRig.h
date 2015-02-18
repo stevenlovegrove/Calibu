@@ -26,7 +26,6 @@
 #include <Eigen/Eigen>
 #include <Eigen/StdVector>
 #include <sophus/se3.hpp>
-#include <vector>
 
 namespace calibu
 {
