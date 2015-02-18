@@ -125,7 +125,7 @@ int main( int argc, char** argv)
   pangolin::VideoInput video(video_uri);
 
   // Vector of images (that will point into buffer)
-  unsigned char image_buffer[video.SizeBytes()];
+  std::unique_ptr<unsigned char[]> image_buffer(new unsigned char[video.SizeBytes()]);
   std::vector<pangolin::Image<unsigned char> > images;
 
   const size_t N = video.Streams().size();
@@ -360,7 +360,7 @@ int main( int argc, char** argv)
       int calib_frame = -1;
 
       if( go ) {
-        if( video.Grab(image_buffer, images, true, true) ) {
+        if( video.Grab(image_buffer.get(), images, true, true) ) {
           if(add) {
             calib_frame = calibrator.AddFrame(Sophus::SE3d(Sophus::SO3d(), Eigen::Vector3d(0,0,1000)) );
           }
@@ -553,7 +553,7 @@ int main( int argc, char** argv)
     ////////////////////////////////////////////////////////////////////
     // Main event loop
 
-    bool valid_frame = video.Grab(image_buffer, images, true, true);
+    bool valid_frame = video.Grab(image_buffer.get(), images, true, true);
 
     while (valid_frame) {
 
@@ -608,7 +608,7 @@ int main( int argc, char** argv)
           }
         }
       }
-      valid_frame = video.Grab(image_buffer, images, true, true);
+      valid_frame = video.Grab(image_buffer.get(), images, true, true);
     }
 
     std::cout<<"Optimization started"<<std::endl;
