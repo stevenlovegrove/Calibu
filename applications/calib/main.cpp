@@ -170,9 +170,9 @@ int main( int argc, char** argv)
       const int h_i = video.Streams()[i].Height();
 
       if(filename == "pinhole") {
-              CameraModelT<Pinhole> starting_cam(w_i, h_i);
-              starting_cam.Params()  << 300, 300, w_i/2.0, h_i/2.0, 0.2;
-              input_cameras.push_back( CameraAndPose(CameraModel(starting_cam), Sophus::SE3d() ) );
+        CameraModelT<Pinhole> starting_cam(w_i, h_i);
+        starting_cam.Params()  << 300, 300, w_i/2.0, h_i/2.0, 0.2;
+        input_cameras.push_back( CameraAndPose(CameraModel(starting_cam), Sophus::SE3d() ) );
       }else if(filename == "fov") {
         CameraModelT<Fov> starting_cam(w_i, h_i);
         starting_cam.Params()  << 300, 300, w_i/2.0, h_i/2.0, 0.2;
