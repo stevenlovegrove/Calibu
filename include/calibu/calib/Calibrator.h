@@ -93,6 +93,7 @@ public:
     
     ~Calibrator()
     {
+        Stop();
     }
 
     /// Write XML file containing configuration of camera rig.
