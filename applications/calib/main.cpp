@@ -328,11 +328,11 @@ int main( int argc, char** argv)
 
     pangolin::Var<bool> add("ui.Add Frames", true, true);
 
-    pangolin::Var<bool> disp_thresh("ui.Display Thresh",false);
-    pangolin::Var<bool> disp_lines("ui.Display Lines",true);
-    pangolin::Var<bool> disp_cross("ui.Display crosses",true);
-    pangolin::Var<bool> disp_bbox("ui.Display bbox",true);
-    pangolin::Var<bool> disp_barcode("ui.Display barcode",false);
+    pangolin::Var<bool> disp_thresh("ui.Display Thresh", false, true);
+    pangolin::Var<bool> disp_lines("ui.Display Lines", true, true);
+    pangolin::Var<bool> disp_cross("ui.Display crosses", true, true);
+    pangolin::Var<bool> disp_bbox("ui.Display bbox", true, true);
+    pangolin::Var<bool> disp_barcode("ui.Display barcode", false, true);
 
     ////////////////////////////////////////////////////////////////////
     // Key shortcuts
