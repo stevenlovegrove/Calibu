@@ -35,8 +35,35 @@ ImageProcessing::~ImageProcessing() {
   DeallocateImageData();
 }
 
+template<typename Scalar>
+void ImageProcessing::Process(const Scalar* greyscale_image, size_t w, size_t h, size_t pitch)
+{
+    width = w;
+    height = h;
+
+    const size_t img_area = width * height;
+    if (img_area > tI.size()) {
+      AllocateImageData(img_area);
+    }
+
+    // Process image
+    gradient<>(width, height, greyscale_image,  &dI[0]);
+    integral_image(width, height, greyscale_image, &intI[0] );
+
+    // Threshold image
+    AdaptiveThreshold(
+        width, height, greyscale_image, &intI[0], &tI[0], params.at_threshold,
+        width / params.at_window_ratio, 20,
+        (unsigned char)0, (unsigned char)255
+                      );
+
+    // Label image (connected components)
+    labels.clear();
+    Label(width, height, &tI[0], &lI[0], labels,
+          params.black_on_white ? 0 : 255 );
+}
+
 void ImageProcessing::AllocateImageData(int maxPixels) {
-  I.resize(maxPixels);
   intI.resize(maxPixels);
   dI.resize(maxPixels);
   lI.resize(maxPixels);
@@ -45,41 +72,10 @@ void ImageProcessing::AllocateImageData(int maxPixels) {
 
 void ImageProcessing::DeallocateImageData() {}
 
-void ImageProcessing::Process(const unsigned char* greyscale_image,
-                              size_t w, size_t h, size_t pitch) {
-  width = w;
-  height = h;
 
-  size_t img_size = width * height * sizeof(unsigned char);
-  if (img_size > I.size()) {
-    AllocateImageData(img_size);
-  }
-
-  // Copy input image
-  if(pitch > width*sizeof(unsigned char) ) {
-    // Copy line by line
-    for(int y=0; y < height; ++y) {
-      memcpy(&I[y*width], greyscale_image+y*pitch, width * sizeof(unsigned char));
-    }
-  }else{
-    memcpy(&I[0], greyscale_image, img_size);
-  }
-
-  // Process image
-  gradient<>(width, height, &I[0],  &dI[0]);
-  integral_image(width, height, &I[0], &intI[0] );
-
-  // Threshold image
-  AdaptiveThreshold(
-      width, height, &I[0], &intI[0], &tI[0], params.at_threshold,
-      width / params.at_window_ratio, 20,
-      (unsigned char)0, (unsigned char)255
-                    );
-
-  // Label image (connected components)
-  labels.clear();
-  Label(width, height, &tI[0], &lI[0], labels,
-        params.black_on_white ? 0 : 255 );
-}
+// Explicit instantiation.
+template void ImageProcessing::Process<unsigned char>(const unsigned char*, size_t, size_t, size_t);
+template void ImageProcessing::Process<unsigned short>(const unsigned short*, size_t, size_t, size_t);
+template void ImageProcessing::Process<float>(const float*, size_t, size_t, size_t);
 
 }

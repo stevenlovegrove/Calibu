@@ -43,12 +43,12 @@ class ImageProcessing {
   ImageProcessing(int maxWidth, int maxHeight);
   ~ImageProcessing();
 
-  void Process(const unsigned char* greyscale_image, size_t w, size_t h, size_t pitch);
+  template<typename Scalar>
+  void Process(const Scalar* greyscale_image, size_t w, size_t h, size_t pitch);
 
   inline int Width()  const { return width; }
   inline int Height() const { return height; }
 
-  inline const unsigned char* Img() const { return &I[0]; }
   inline const Eigen::Vector2f* ImgDeriv() const { return &dI[0]; }
   inline const unsigned char* ImgThresh() const { return &tI[0]; }
   inline const std::vector<PixelClass>& Labels() const { return labels; }
@@ -64,7 +64,6 @@ class ImageProcessing {
   int width, height;
 
   // Images owned by this class
-  std::vector<unsigned char> I;
   std::vector<float> intI;
   std::vector<Eigen::Vector2f, Eigen::aligned_allocator<Eigen::Vector2f> > dI;
   std::vector<short> lI;

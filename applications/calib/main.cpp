@@ -425,7 +425,7 @@ int main( int argc, char** argv)
 
           // Display camera image
           if(!disp_thresh) {
-            tex[iI].Upload(image_processing.Img(),GL_LUMINANCE,GL_UNSIGNED_BYTE);
+            tex[iI].Upload(images[iI].ptr,GL_LUMINANCE,GL_UNSIGNED_BYTE);
             tex[iI].RenderToViewportFlipY();
           }else{
             tex[iI].Upload(image_processing.ImgThresh(),GL_LUMINANCE,GL_UNSIGNED_BYTE);
